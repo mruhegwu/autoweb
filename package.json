@@ -1,0 +1,21 @@
+{
+  "name": "autoweb",
+  "version": "1.0.0",
+  "description": "Automated website deployment to GitHub Pages via GitHub Actions",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "lint:js": "eslint src",
+    "lint:css": "stylelint src/**/*.css",
+    "lint": "npm run lint:js && npm run lint:css"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.22.0",
+    "eslint": "^9.22.0",
+    "jsdom": "^26.0.0",
+    "stylelint": "^16.16.0",
+    "stylelint-config-standard": "^37.0.0",
+    "vitest": "^3.0.9"
+  }
+}
