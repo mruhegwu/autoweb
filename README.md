@@ -29,7 +29,7 @@ Automated website deployment to GitHub Pages via GitHub Actions.
 ### Workflow analysis (`.github/workflows/deploy.yml`)
 
 ```
-push / PR to main ──► build job ──► (main only) ──► deploy job ──► GitHub Pages
+push / PR to main ──► lint + test jobs ──► build job ──► (main only) ──► deploy job ──► GitHub Pages
 ```
 
 | Concern | How it is handled |
@@ -39,6 +39,7 @@ push / PR to main ──► build job ──► (main only) ──► deploy job
 | Concurrency | `group: pages`, `cancel-in-progress: false` prevents overlapping deploys while queuing new ones |
 | PR safety | `if: github.ref == 'refs/heads/main'` ensures deploys never run on PR branches |
 | Pinned actions | All actions use `@v4`/`@v5` major-version pins – stable but still auto-receives patch updates |
+| Quality gate | `build` job depends on `lint` and `test` jobs; broken code cannot be deployed |
 
 ### Strengths
 
@@ -50,30 +51,31 @@ push / PR to main ──► build job ──► (main only) ──► deploy job
 
 ### Areas for improvement
 
-| Priority | Improvement | Rationale |
-|----------|------------|-----------|
-| High | Add a `package.json` and a lightweight test runner (e.g. Vitest) | There are currently no automated tests; the copyright-year logic in `main.js` and future JS changes would benefit from unit tests |
-| High | Add linting to CI (ESLint + Stylelint) | Catches errors before they reach the deployed site |
-| Medium | Add a Lighthouse / web-vitals CI step | Prevents performance or accessibility regressions |
-| Medium | Add a `LICENSE` file | The repository has no declared licence |
-| Medium | Add HTML validation (e.g. html-validate) | Ensures the markup stays well-formed |
-| Low | Add a meta description tag to `index.html` | Improves SEO discoverability |
-| Low | Add `CONTRIBUTING.md` and PR / issue templates | Lowers the barrier for outside contributors |
+| Priority | Improvement | Status |
+|----------|------------|--------|
+| High | Add a `package.json` and a lightweight test runner (Vitest) | ✅ Done |
+| High | Add linting to CI (ESLint + Stylelint) | ✅ Done |
+| Medium | Add a Lighthouse / web-vitals CI step | Open |
+| Medium | Add a `LICENSE` file | ✅ Done |
+| Medium | Add HTML validation (e.g. html-validate) | Open |
+| Low | Add a meta description tag to `index.html` | ✅ Done |
+| Low | Add `CONTRIBUTING.md` and PR / issue templates | Open |
 
 ## How it works
 
 Every push to the `main` branch triggers the CI/CD pipeline defined in [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml):
 
-1. **Build** – checks out the repository and packages the contents of `src/` as a Pages artifact.
-2. **Deploy** – publishes the artifact to GitHub Pages.
+1. **Lint** – runs ESLint (JavaScript) and Stylelint (CSS) in parallel with the test job.
+2. **Test** – runs Vitest unit tests.
+3. **Build** – checks out the repository and packages the contents of `src/` as a Pages artifact (only runs after lint and test pass).
+4. **Deploy** – publishes the artifact to GitHub Pages.
 
 ```
 push to main
       │
-      ▼
-  ┌────────┐       ┌──────────┐
-  │  build │──────►│  deploy  │──► GitHub Pages
-  └────────┘       └──────────┘
+      ├──► lint ──┐
+      │            ├──► build ──► deploy ──► GitHub Pages
+      └──► test ──┘
 ```
 
 ## Project structure
@@ -83,10 +85,16 @@ autoweb/
 ├── src/            # Website source files (deployed to Pages)
 │   ├── index.html
 │   ├── style.css
-│   └── main.js
+│   ├── main.js
+│   └── main.test.js  # Vitest unit tests
 ├── .github/
 │   └── workflows/
-│       └── deploy.yml  # CI/CD pipeline
+│       └── deploy.yml  # CI/CD pipeline (lint → test → build → deploy)
+├── eslint.config.js    # ESLint configuration
+├── vitest.config.js    # Vitest configuration
+├── .stylelintrc.json   # Stylelint configuration
+├── package.json
+├── LICENSE
 └── README.md
 ```
 
@@ -104,6 +112,14 @@ Open `src/index.html` directly in a browser, or use any static file server:
 
 ```bash
 npx serve src
+```
+
+Install dev dependencies for linting and testing:
+
+```bash
+npm install
+npm test      # run Vitest unit tests
+npm run lint  # run ESLint + Stylelint
 ```
 
 ## Contributing

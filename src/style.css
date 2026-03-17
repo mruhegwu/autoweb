@@ -16,7 +16,7 @@ body {
 
 header {
   background-color: #0969da;
-  color: #ffffff;
+  color: #fff;
   padding: 2rem;
   text-align: center;
 }
@@ -40,7 +40,7 @@ main {
 }
 
 section {
-  background-color: #ffffff;
+  background-color: #fff;
   border: 1px solid #d0d7de;
   border-radius: 6px;
   padding: 1.5rem;
