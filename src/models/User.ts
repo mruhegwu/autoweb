@@ -67,12 +67,7 @@ export class User {
   }
 
   toJSON(): Record<string, unknown> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, refreshToken, hashPassword, comparePassword, ...rest } = this as Record<string, unknown>;
-    void password;
-    void refreshToken;
-    void hashPassword;
-    void comparePassword;
+    const { password: _p, refreshToken: _r, hashPassword: _h, comparePassword: _c, ...rest } = this as Record<string, unknown>;
     return rest;
   }
 }

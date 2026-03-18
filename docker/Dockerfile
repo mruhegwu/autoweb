@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-RUN npm ci --only=production=false
+RUN npm ci
 
 # Copy source
 COPY tsconfig.json ./

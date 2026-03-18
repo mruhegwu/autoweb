@@ -4,7 +4,6 @@ import { User } from '../models/User';
 
 export function getDatabaseConfig(): DataSourceOptions {
   const env = getEnv();
-  const isTest = env.NODE_ENV === 'test';
 
   return {
     type: 'postgres',
@@ -12,7 +11,7 @@ export function getDatabaseConfig(): DataSourceOptions {
     port: env.DB_PORT,
     username: env.DB_USER,
     password: env.DB_PASSWORD,
-    database: isTest ? `${env.DB_NAME}_test` : env.DB_NAME,
+    database: env.DB_NAME,
     ssl: env.DB_SSL ? { rejectUnauthorized: false } : false,
     entities: [User],
     migrations: ['src/database/migrations/*.ts'],
